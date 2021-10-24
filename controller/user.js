@@ -18,6 +18,7 @@ exports.createUser =(req,res)=>{
 }
 
 exports.getUsers = (req,res)=>{
+    console.log('getall')
     User.find().exec((err,users)=>{
         if(err){
             return res.status(401).json({
