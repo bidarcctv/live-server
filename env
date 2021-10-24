@@ -1,0 +1,3 @@
+DATABASE = mongodb+srv://kushalkulle:%40rjunaK3@cluster0.vrbyj.mongodb.net/sgt-live?authSource=admin&replicaSet=atlas-3tcyfr-shard-0&readPreference=primary&ssl=true
+PORT = 8888
+SECRET =scheme
