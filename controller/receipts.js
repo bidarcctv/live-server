@@ -2,6 +2,18 @@ const Receipt = require('../model/receipts')
 const User = require('../model/user')
 
 
+exports.getReceiptId = (req, res, next, _id) => {
+    Receipt.findById(_id).exec((err, receipt) => {
+        if (err) {
+            return res.status(500).json({
+                error: "category id not found."
+            })
+        }
+        req.profile = receipt
+        next()
+    })
+}
+
 exports.createReceipt =(req,res)=>{
     Receipt.find().exec((err,receipts)=>{
         let receipt = new Receipt(req.body);
@@ -44,6 +56,7 @@ exports.getReceipt = (req,res)=>{
             count:receipts.length,
             response:receipts
         })
+        req.profiles = receipts
     })
 }
 
@@ -68,4 +81,35 @@ exports.getReceiptByMember = (req, res) => {
         })
     })
     
+}
+
+exports.updateReceipt = (req, res) => {
+    Receipt.findByIdAndUpdate({ _id: req.body._id }, { $set: req.body }, { new: true, useFindAndModify: false },
+        (err, category) => {
+            if (err) {
+                return res.status(400).json({
+                    err,
+                    error: 'update receipt failed'
+                })
+            }
+            category.__v = undefined
+            res.json({status: 'success', message: 'Receipt update successful'})
+        })
+}
+
+exports.removeReceipt = (req, res) => {
+    const receipt = req.profile
+    console.log(receipt)
+    receipt.remove((err, receipt) => {
+        if (err || !receipt) {
+            return res.status(400).json({
+                error: "delete receipt failed"
+            })
+        }
+        res.json({
+            status: 'success',
+            response: receipt,
+            message: 'Successfully Deleted.'
+        })
+    })
 }

@@ -47,3 +47,17 @@ exports.getUserById = (req, res) => {
         })
     })
 }
+
+exports.updateUser = (req, res) => {
+    User.findByIdAndUpdate({ _id: req.body._id }, { $set: req.body }, { new: true, useFindAndModify: false },
+        (err, category) => {
+            if (err) {
+                return res.status(400).json({
+                    err,
+                    error: 'update user failed'
+                })
+            }
+            category.__v = undefined
+            res.json({status: 'success', message: 'User update successful'})
+        })
+}
