@@ -14,56 +14,57 @@ exports.getReceiptId = (req, res, next, _id) => {
     })
 }
 
-exports.createReceipt =(req,res)=>{
-    Receipt.find().exec((err,receipts)=>{
+exports.createReceipt = (req, res) => {
+    Receipt.find().exec((err, receipts) => {
         let receipt = new Receipt(req.body);
 
         // console.log(receipts.map(d=> d.receiptNo).includes(receipt.receiptNo));
-        if(!receipts.map(d=> d.receiptNo).includes(receipt.receiptNo)){
-            receipt.save((err,receipt)=>{
-                if(err){
+        if (!receipts.map(d => d.receiptNo).includes(receipt.receiptNo)) {
+            receipt.save((err, receipt) => {
+                if (err) {
                     return res.status(401).json({
-                        status:'failed to add receipt',
-                        error:err
+                        status: 'failed to add receipt',
+                        error: err
                     })
                 }
                 console.log(receipt);
                 res.json({
-                    status:'success',
-                    response:receipt
+                    status: 'success',
+                    response: receipt
                 })
             })
-        }else{
+        } else {
             res.json({
                 status: 'failed',
-                response: 'Receipt ' +receipt.receiptNo + ' already exist'
+                response: 'Receipt ' + receipt.receiptNo + ' already exist'
             })
         }
     })
     // console.log(Receipt);
 }
 
-exports.getReceipt = (req,res)=>{
-    Receipt.find().exec((err,receipts)=>{
-        if(err){
+exports.getReceipt = (req, res) => {
+    Receipt.find().exec((err, receipts) => {
+        if (err) {
             return res.status(401).json({
-                status:'failed getting receipts',
-                error : err
+                status: 'failed getting receipts',
+                error: err
             })
         }
         res.json({
-            status:'success',
-            count:receipts.length,
-            response:receipts
+            status: 'success',
+            count: receipts.length,
+            response: receipts
         })
         req.profiles = receipts
     })
 }
 
-exports.getReceiptByMember = (req, res) => {
-    User.findOne({ memberId: req.body.memberId }).exec((err, items) => {
 
-        if (items == null) {
+exports.getReceiptByMember = (req, res) => {
+    User.findOne({ memberId: req.body.memberId }).exec((err, user) => {
+
+        if (user == null) {
             return res.status(401).json({
                 error: "Users not found"
             })
@@ -76,11 +77,13 @@ exports.getReceiptByMember = (req, res) => {
             }
             res.json({
                 status: 'success',
-                response: items
+                paidInstallments: items.map(d => d.installmentNo),
+                memberName: user.memberName,
+                memberId: user.memberId
             })
         })
     })
-    
+
 }
 
 exports.updateReceipt = (req, res) => {
@@ -93,7 +96,7 @@ exports.updateReceipt = (req, res) => {
                 })
             }
             category.__v = undefined
-            res.json({status: 'success', message: 'Receipt update successful'})
+            res.json({ status: 'success', message: 'Receipt update successful' })
         })
 }
 
