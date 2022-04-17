@@ -47,16 +47,33 @@ exports.getUserById = (req, res) => {
     })
 }
 
+
+
 exports.updateUser = (req, res) => {
     User.findByIdAndUpdate({ _id: req.body._id }, { $set: req.body }, { new: true, useFindAndModify: false },
-        (err, category) => {
+        (err, user) => {
             if (err) {
                 return res.status(400).json({
                     err,
                     error: 'update user failed'
                 })
             }
-            category.__v = undefined
-            res.json({status: 'success', message: 'User update successful'})
+            user.__v = undefined
+            res.json({status: 'success', message: 'User update successful', user: user})
         })
 }
+
+exports.getWinners = (req, res) => {
+    User.find({ remarks: 'Winner' }).exec((err, items) => {
+        if (err) {
+            return res.status(401).json({
+                error: err
+            })
+        }
+        res.json({
+            status: 'success',
+            response: items
+        })
+    })
+}
+

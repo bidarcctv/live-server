@@ -25,8 +25,13 @@ const userSchema = new mongoose.Schema({
     remarks: {
         type: String,
         trim: true
+    },
+    winner_serial:{
+        type: String,
+        trim:true,
+        unique:true
     }
 
-}, { timestamps: true })
+}, { timestamps: true, strict: false })
 
 module.exports = mongoose.model('User', userSchema)
