@@ -1,4 +1,5 @@
-const User = require('../model/user')
+const User = require('../model/user');
+const Auth = require('../model/auth');
 
 
 exports.createUser =(req,res)=>{
@@ -28,6 +29,33 @@ exports.getUsers = (req,res)=>{
         res.json({
             status:'success',
             members:users
+        })
+    })
+}
+
+exports.listadmins = (req,res)=> {
+     Auth.find().exec((err,admins)=>{
+        if(err){
+            return res.status(401).json({
+                status:'failed getting users',
+                error : err
+            })
+        }
+
+
+        console.log(admins)
+
+        let result = []
+        admins.map(d=> {
+            let {username, _id} = d;
+            result.push({username, _id})
+        })
+
+        console.log(result)
+        
+        res.json({
+            status:'success',
+            adminUsers:result
         })
     })
 }
@@ -63,6 +91,41 @@ exports.updateUser = (req, res) => {
         })
 }
 
+exports.login = (req, res) => {
+    Auth.findOne({username:req.body.username, password: req.body.password}).exec((err, user) => {
+        if (err) {
+            return res.status(401).json({
+                error: err
+            })
+        }
+        
+
+        if(!user){
+            res.json({
+                status: 'fail',
+                message:'invalid credentials'
+            })
+            return
+        }else if(user && user.isAdmin == 'true'){ 
+            res.json({
+                status: 'success',
+                response: {"user": user.username, "admin": true}
+            })
+            return
+        }
+
+
+        // let result
+        // if(user.password == req.body.password){
+
+        // }
+        res.json({
+            status: 'success',
+            response: user
+        })
+    })
+}
+
 exports.getWinners = (req, res) => {
     User.find({ remarks: 'Winner' }).exec((err, items) => {
         if (err) {
@@ -73,6 +136,22 @@ exports.getWinners = (req, res) => {
         res.json({
             status: 'success',
             response: items
+        })
+    })
+}
+
+exports.addAuthUser = (req,res) => {
+    let authUser = new Auth(req.body)
+    authUser.save((err,aU)=>{
+        if(err){
+            return res.status(401).json({
+                status: 'failed to create auth user',
+                error: err
+            })
+        }
+        res.json({
+            status:'sucess',
+            response:aU
         })
     })
 }
